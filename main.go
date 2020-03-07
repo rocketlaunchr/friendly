@@ -39,5 +39,8 @@ func main() {
 	rootCmd.Flags().BoolP("remove", "r", false, "remove stored ssl certificate")
 	rootCmd.Flags().BoolP("quiet", "q", false, "don't produce logs")
 
-	log.Fatal(rootCmd.Execute())
+	err := rootCmd.Execute()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
