@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var VERSION = "1.0.0" // Use git tag
-var GITCOMMIT = ""    // Use current git commit id
+var VERSION = ""   // Use git tag: $(git describe --always)
+var GITCOMMIT = "" // Use current git commit id: $(git rev-parse --short HEAD)
 
 func main() {
 
