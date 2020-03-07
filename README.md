@@ -34,6 +34,8 @@ It supports:
 
 or just place the application in your project path and run it without flags.
 
+The recommended way is to install it globally (using $PATH). Then you can run the server from anywhere without setting a `path` (which defaults to the current working directory).
+
 ## Flags
 
 ### port (p)
@@ -71,7 +73,7 @@ Don't show any logs of the incoming requests.
 
 Just download the prebuilt executables from the [Releases](https://github.com/rocketlaunchr/httpserver/releases). It is available for **Windows**, **macOS** and **Linux**.
 
-If you want customize the project to your needs, then clone this repo. You will need to know how to build Go projects after downloading it's dependencies.
+If you want to customize the project to your needs, then clone this repo. You will need to know how to build Go projects after downloading the dependencies.
 
 
 ```bash

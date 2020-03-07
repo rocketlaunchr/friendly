@@ -39,7 +39,7 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			d := end.Sub(start)
 
 			if lastReqTime != nil && time.Since(*lastReqTime) > 1*time.Second {
-				fmt.Println("===================")
+				fmt.Println("==========================")
 			}
 
 			lastReqTime = &start
