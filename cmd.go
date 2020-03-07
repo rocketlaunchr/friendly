@@ -61,24 +61,30 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				filePath := filepath.Join(h.localPath, "index.html") // wierd: Can't move filePath to outside if
 				fi, err := os.Stat(filePath)
 				if err == nil {
-					size := fi.Size() / 1024 // converted to KB
-					if size == 0 {
-						sizeStr = fmt.Sprintf("[%dKB]", size)
+					size := fi.Size()
+					if size/1024 != 0 { // converted to KB
+						sizeStr = fmt.Sprintf("[%dKB]", size/1024)
+					} else {
+						sizeStr = fmt.Sprintf("[%dB]", size)
 					}
 				}
 			} else {
 				filePath := filepath.Join(h.localPath, r.URL.Path) // wierd: Can't move filePath to outside if
 				fi, err := os.Stat(filePath)
 				if err == nil {
-					size := fi.Size() / 1024 // converted to KB
-					if size != 0 {
-						sizeStr = fmt.Sprintf("[%dKB]", size)
+					size := fi.Size()
+					if size/1024 != 0 { // converted to KB
+						sizeStr = fmt.Sprintf("[%dKB]", size/1024)
+					} else {
+						sizeStr = fmt.Sprintf("[%dB]", size)
 					}
 				}
 			}
 
 			switch filepath.Ext(r.URL.Path) {
-			case ".html", "":
+			case "":
+				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), html("/index.html"), sizeStr)
+			case ".html":
 				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), html(r.URL.Path), sizeStr)
 			case ".js":
 				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), js(r.URL.Path), sizeStr)
