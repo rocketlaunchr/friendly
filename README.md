@@ -1,4 +1,11 @@
-# httpserver
+httpserver - The friendly webserver (For local development)
+======
+
+
+<p align="center">
+<img src="https://github.com/rocketlaunchr/httpserver/raw/master/logo.png" alt="httpserver" />
+</p>
+
 
 When you are developing your website locally, you may be encountering **CORS** issues.
 In my case, I had an `iframe` that was calling `parent` to access the host site.
