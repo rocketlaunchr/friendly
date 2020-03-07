@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -27,8 +28,9 @@ var noCacheHeaders = map[string]string{
 var lastReqTime *time.Time
 
 type wrapHandler struct {
-	fs    http.Handler
-	quiet bool
+	fs        http.Handler
+	quiet     bool
+	localPath string
 }
 
 func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +41,7 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			d := end.Sub(start)
 
 			if lastReqTime != nil && time.Since(*lastReqTime) > 1*time.Second {
-				fmt.Println("==========================")
+				fmt.Println("============================")
 			}
 
 			lastReqTime = &start
@@ -53,17 +55,39 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			img := color.New(color.Bold, color.FgYellow).SprintFunc()
 			other := color.New(color.Bold, color.FgBlack).SprintFunc()
 
+			// Get file size
+			var sizeStr string
+			if r.URL.Path == "/" {
+				filePath := filepath.Join(h.localPath, "index.html") // wierd: Can't move filePath to outside if
+				fi, err := os.Stat(filePath)
+				if err == nil {
+					size := fi.Size() / 1024 // converted to KB
+					if size == 0 {
+						sizeStr = fmt.Sprintf("[%dKB]", size)
+					}
+				}
+			} else {
+				filePath := filepath.Join(h.localPath, r.URL.Path) // wierd: Can't move filePath to outside if
+				fi, err := os.Stat(filePath)
+				if err == nil {
+					size := fi.Size() / 1024 // converted to KB
+					if size != 0 {
+						sizeStr = fmt.Sprintf("[%dKB]", size)
+					}
+				}
+			}
+
 			switch filepath.Ext(r.URL.Path) {
-			case ".html":
-				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), html(r.URL.Path))
+			case ".html", "":
+				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), html(r.URL.Path), sizeStr)
 			case ".js":
-				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), js(r.URL.Path))
+				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), js(r.URL.Path), sizeStr)
 			case ".css":
-				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), css(r.URL.Path))
+				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), css(r.URL.Path), sizeStr)
 			case ".png", ".jpg", ".jpeg", ".ico", ".svg":
-				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), img(r.URL.Path))
+				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), img(r.URL.Path), sizeStr)
 			default:
-				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), other(r.URL.Path))
+				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), other(r.URL.Path), sizeStr)
 			}
 		}()
 	}
@@ -79,7 +103,6 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func runCmd(cmd *cobra.Command, args []string) {
 
 	quietMode, _ := cmd.Flags().GetBool("quiet")
-
 	port, _ := cmd.Flags().GetString("port")
 	path, _ := cmd.Flags().GetString("path")
 	httpsOn, _ := cmd.Flags().GetBool("https")
@@ -95,7 +118,7 @@ func runCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	http.Handle("/", &wrapHandler{http.FileServer(http.Dir(path)), quietMode})
+	http.Handle("/", &wrapHandler{http.FileServer(http.Dir(path)), quietMode, path})
 
 	var homeURL string
 	if httpsOn {
@@ -112,13 +135,6 @@ func runCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	if browserOpen {
-		go func() {
-			time.Sleep(1250 * time.Millisecond)
-			browser.OpenURL(homeURL)
-		}()
-	}
-
 	if removeCerts {
 		err := deleteCerts()
 		if err != nil {
@@ -129,6 +145,14 @@ func runCmd(cmd *cobra.Command, args []string) {
 	}
 
 	if !httpsOn {
+
+		if browserOpen {
+			go func() {
+				time.Sleep(1250 * time.Millisecond)
+				browser.OpenURL(homeURL)
+			}()
+		}
+
 		log.Fatal(http.ListenAndServe(":"+port, nil))
 	} else {
 
@@ -153,6 +177,13 @@ func runCmd(cmd *cobra.Command, args []string) {
 			Addr:      ":" + port,
 			TLSConfig: &tls.Config{Certificates: []tls.Certificate{cert}},
 			ErrorLog:  log.New(&ThrowAway{}, "", 0),
+		}
+
+		if browserOpen {
+			go func() {
+				time.Sleep(1250 * time.Millisecond)
+				browser.OpenURL(homeURL)
+			}()
 		}
 
 		log.Fatal(httpServer.ListenAndServeTLS("", ""))
