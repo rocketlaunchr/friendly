@@ -7,6 +7,8 @@ httpserver - The friendly webserver (For local development)
 </p>
 
 
+⭐ **the project to show your appreciation.**
+
 When you are developing your website locally, you may be encountering **CORS** issues.
 In my case, I had an `iframe` that was calling `parent` to access the host site.
 All major browsers such as Chrome, Safari and Firefox were blocking the call.
@@ -21,14 +23,13 @@ It supports:
 - custom ports
 - custom paths (so you don't need to place it in the same directory as your project)
 
-
-⭐ **the project to show your appreciation.**
-
 ## Usage
 
 ```bash
 ./httpserver -d "<path>"  -b --save -r -s
 ```
+
+or just place the application in your project path and run it without flags.
 
 ## Flags
 
@@ -61,7 +62,6 @@ Delete a certificate you may have saved in the past.
 ### quiet (q)
 
 Don't show any logs of the incoming requests.
-
 
 
 ## Installation
