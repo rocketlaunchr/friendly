@@ -23,6 +23,9 @@ It supports:
 - custom ports
 - custom paths (so you don't need to place it in the same directory as your project)
 
+
+**[Download here](https://github.com/rocketlaunchr/httpserver/releases)**
+
 ## Usage
 
 ```bash
