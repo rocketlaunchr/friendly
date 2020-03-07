@@ -24,6 +24,12 @@ It supports:
 
 ⭐ **the project to show your appreciation.**
 
+## Usage
+
+```bash
+./httpserver -d "<path>"  -b --save -r -s
+```
+
 ## Flags
 
 ### port (p)
