@@ -60,7 +60,7 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), js(r.URL.Path))
 			case ".css":
 				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), css(r.URL.Path))
-			case ".png", ".jpg", ".jpeg", ".ico":
+			case ".png", ".jpg", ".jpeg", ".ico", ".svg":
 				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), img(r.URL.Path))
 			default:
 				fmt.Printf("[%s#%s] %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), other(r.URL.Path))
