@@ -82,8 +82,6 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			switch filepath.Ext(r.URL.Path) {
-			case "":
-				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), html("/index.html"), sizeStr)
 			case ".html":
 				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), html(r.URL.Path), sizeStr)
 			case ".js":
@@ -93,7 +91,11 @@ func (h *wrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			case ".png", ".jpg", ".jpeg", ".ico", ".svg":
 				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), img(r.URL.Path), sizeStr)
 			default:
-				fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), other(r.URL.Path), sizeStr)
+				if r.URL.Path == "/" {
+					fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), html("/index.html"), sizeStr)
+				} else {
+					fmt.Printf("[%s#%s] %s %s %s\n", magenta1("%s", start.Local().Format("15:04:05.000")), magenta2("%s", d.String()), strings.ToUpper(r.Method), other(r.URL.Path), sizeStr)
+				}
 			}
 		}()
 	}

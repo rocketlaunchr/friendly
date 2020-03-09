@@ -17,15 +17,15 @@ func main() {
 
 	var versionCmd = &cobra.Command{
 		Use:   "version",
-		Short: "Version prints the httpserver version",
+		Short: "Version prints the version of friendly",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("httpserver version: " + VERSION + " (" + GITCOMMIT + ")")
+			fmt.Println("friendly version: " + VERSION + " (" + GITCOMMIT + ")")
 			os.Exit(0)
 		},
 	}
 
 	var rootCmd = &cobra.Command{
-		Use: "httpserver",
+		Use: "friendly",
 		Run: runCmd,
 	}
 

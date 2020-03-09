@@ -22,7 +22,7 @@ func getCerts(gen bool) ([]byte, []byte, error) {
 	}
 	exePath = filepath.Dir(exePath)
 
-	content, err := ioutil.ReadFile(filepath.Join(exePath, "httpserver.cert"))
+	content, err := ioutil.ReadFile(filepath.Join(exePath, "friendly.cert"))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -49,7 +49,7 @@ func saveCerts(public []byte, private []byte) error {
 		"public":  string(public),
 	})
 
-	return ioutil.WriteFile(filepath.Join(exePath, "httpserver.cert"), data, 0644)
+	return ioutil.WriteFile(filepath.Join(exePath, "friendly.cert"), data, 0644)
 }
 
 func deleteCerts() error {
@@ -59,5 +59,5 @@ func deleteCerts() error {
 	}
 	exePath = filepath.Dir(exePath)
 
-	return os.Remove(filepath.Join(exePath, "httpserver.cert"))
+	return os.Remove(filepath.Join(exePath, "friendly.cert"))
 }
